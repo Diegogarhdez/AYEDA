@@ -14,7 +14,7 @@
 #include <fstream>
 #include <vector>
 #include "BigInteger.h"
-
+#include "BigComplex.h"
 
 int main(int argc, char* argv[]) {
   if (argc < 2) {
@@ -32,13 +32,13 @@ int main(int argc, char* argv[]) {
   std::cout << num1 % num2 << "\n";
  */
 
-  BigInteger entero1, entero2, em;
-  fichero_entrada >> entero1 >> entero2;
-  std::cout << "Entero1: " << entero1 << "\n";
-  std::cout << "Entero2: " << entero2 << "\n";
-  //std::cout << entero1 % entero2 << "\n";
+  BigInteger entero1, entero2, entero3, entero4;
+  fichero_entrada >> entero1 >> entero2 >> entero3 >> entero4;
+  BigComplex complejo1(entero1, entero2), complejo2(entero3, entero4);
+  std::cout << "Suma de dos complejos: " << complejo1 + complejo2 << "\n";
+/*   std::cout << entero1 % entero2 << "\n";
   BigInteger entero3 = mcd(entero1, entero2);
-  std::cout << "MCD de los dos enteros anteriores: " << entero3 << "\n";
+  std::cout << "MCD de los dos enteros anteriores: " << entero3 << "\n"; */
 
 /**  std::cout << "Se procede a operar con los BigUnisgned\n";
   BigUnsigned numerin4 = numerin1 + numerin2;
