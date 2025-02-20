@@ -158,6 +158,7 @@ CMakeFiles/BigNumbers.dir/main.cc.o: \
  /usr/include/x86_64-linux-gnu/c++/13/bits/basic_file.h \
  /usr/include/x86_64-linux-gnu/c++/13/bits/c++io.h \
  /usr/include/c++/13/bits/fstream.tcc \
+ /home/usuario/AYEDA/P2/P2_casa/BigRational.h \
  /home/usuario/AYEDA/P2/P2_casa/BigInteger.h /usr/include/c++/13/vector \
  /usr/include/c++/13/bits/stl_uninitialized.h \
  /usr/include/c++/13/bits/stl_vector.h \

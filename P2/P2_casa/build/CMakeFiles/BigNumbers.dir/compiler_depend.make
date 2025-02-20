@@ -3,6 +3,7 @@
 
 CMakeFiles/BigNumbers.dir/main.cc.o: /home/usuario/AYEDA/P2/P2_casa/main.cc \
   /home/usuario/AYEDA/P2/P2_casa/BigInteger.h \
+  /home/usuario/AYEDA/P2/P2_casa/BigRational.h \
   /home/usuario/AYEDA/P2/P2_casa/BigUnsigned.h \
   /usr/include/alloca.h \
   /usr/include/asm-generic/errno-base.h \
@@ -334,6 +335,10 @@ CMakeFiles/BigNumbers.dir/main.cc.o: /home/usuario/AYEDA/P2/P2_casa/main.cc \
 
 /usr/include/c++/13/vector:
 
+/usr/include/wchar.h:
+
+/usr/include/c++/13/bits/memory_resource.h:
+
 /usr/include/c++/13/bits/invoke.h:
 
 /usr/include/c++/13/bits/locale_classes.h:
@@ -356,15 +361,9 @@ CMakeFiles/BigNumbers.dir/main.cc.o: /home/usuario/AYEDA/P2/P2_casa/main.cc \
 
 /usr/include/c++/13/bits/nested_exception.h:
 
-/usr/include/c++/13/bits/memory_resource.h:
-
-/usr/include/wchar.h:
-
 /usr/include/x86_64-linux-gnu/bits/time64.h:
 
 /usr/include/c++/13/bits/basic_ios.h:
-
-/usr/include/c++/13/bits/move.h:
 
 /usr/include/x86_64-linux-gnu/sys/single_threaded.h:
 
@@ -402,29 +401,15 @@ CMakeFiles/BigNumbers.dir/main.cc.o: /home/usuario/AYEDA/P2/P2_casa/main.cc \
 
 /usr/include/c++/13/cwctype:
 
-/usr/include/c++/13/bits/predefined_ops.h:
-
 /usr/include/c++/13/bits/ranges_cmp.h:
+
+/usr/include/c++/13/bits/predefined_ops.h:
 
 /usr/include/c++/13/iosfwd:
 
 /usr/include/c++/13/cwchar:
 
 /home/usuario/AYEDA/P2/P2_casa/BigInteger.h:
-
-/usr/include/c++/13/bits/ranges_base.h:
-
-/usr/include/c++/13/istream:
-
-/usr/include/c++/13/string_view:
-
-/usr/include/features-time64.h:
-
-/usr/include/x86_64-linux-gnu/bits/endianness.h:
-
-/usr/include/c++/13/bits/basic_string.h:
-
-/usr/include/stdc-predef.h:
 
 /usr/include/c++/13/bits/locale_facets.tcc:
 
@@ -444,6 +429,20 @@ CMakeFiles/BigNumbers.dir/main.cc.o: /home/usuario/AYEDA/P2/P2_casa/main.cc \
 
 /usr/include/c++/13/iostream:
 
+/usr/include/c++/13/bits/ranges_base.h:
+
+/usr/include/c++/13/istream:
+
+/usr/include/c++/13/string_view:
+
+/usr/include/features-time64.h:
+
+/usr/include/x86_64-linux-gnu/bits/endianness.h:
+
+/usr/include/c++/13/bits/basic_string.h:
+
+/usr/include/stdc-predef.h:
+
 /usr/include/x86_64-linux-gnu/c++/13/bits/os_defines.h:
 
 /usr/include/x86_64-linux-gnu/c++/13/bits/c++locale.h:
@@ -459,6 +458,12 @@ CMakeFiles/BigNumbers.dir/main.cc.o: /home/usuario/AYEDA/P2/P2_casa/main.cc \
 /usr/include/c++/13/bits/memoryfwd.h:
 
 /usr/include/time.h:
+
+/usr/include/c++/13/bits/move.h:
+
+/usr/include/c++/13/bits/utility.h:
+
+/usr/include/c++/13/bits/stl_function.h:
 
 /usr/include/c++/13/bits/cxxabi_forced.h:
 
@@ -528,10 +533,6 @@ CMakeFiles/BigNumbers.dir/main.cc.o: /home/usuario/AYEDA/P2/P2_casa/main.cc \
 
 /usr/include/c++/13/bits/uses_allocator_args.h:
 
-/usr/include/c++/13/bits/stl_function.h:
-
-/usr/include/c++/13/bits/utility.h:
-
 /usr/include/c++/13/bits/vector.tcc:
 
 /usr/include/c++/13/clocale:
@@ -597,6 +598,8 @@ CMakeFiles/BigNumbers.dir/main.cc.o: /home/usuario/AYEDA/P2/P2_casa/main.cc \
 /usr/include/c++/13/bits/range_access.h:
 
 /usr/include/c++/13/system_error:
+
+/home/usuario/AYEDA/P2/P2_casa/BigRational.h:
 
 /usr/include/c++/13/bits/cxxabi_init_exception.h:
 
