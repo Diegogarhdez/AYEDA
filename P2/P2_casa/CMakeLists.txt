@@ -40,6 +40,8 @@ include_directories(${PROJECT_SOURCE_DIR})
 add_executable("BigNumbers"
     BigInteger.h
     BigUnsigned.h
+    BigRational.h
+    BigIntegerBase2.h
     main.cc
     )
 # Add expected compiler features to a target.

@@ -15,6 +15,8 @@
 
 #include <iostream>
 #include <vector>
+#include <string>
+#include <algorithm>
 
 #include "BigUnsigned.h"
 
@@ -145,10 +147,9 @@ template<unsigned char Base> BigInteger<Base> BigInteger<Base>::operator-(const 
  */
 template<unsigned char Base> BigInteger<Base> BigInteger<Base>::operator*(const BigInteger<Base>& other) const {
   BigUnsigned<Base> result = numero_ * other.GetNumero();
-  bool result_sign = signo_ == other.GetSigno();
+  bool result_sign = signo_ != other.GetSigno();  
   BigInteger<Base> result_bigint(result);
   result_bigint.SetSigno(result_sign);
-
   return result_bigint;
 }
 
@@ -159,10 +160,9 @@ template<unsigned char Base> BigInteger<Base> BigInteger<Base>::operator*(const 
  */
 template<unsigned char Base> BigInteger<Base> BigInteger<Base>::operator/(const BigInteger<Base>& other) const {
   BigUnsigned<Base> result = numero_ / other.GetNumero();
-  bool result_sign = signo_ == other.GetSigno();
+  bool result_sign = signo_ != other.GetSigno(); 
   BigInteger<Base> result_bigint(result);
   result_bigint.SetSigno(result_sign);
-
   return result_bigint;
 }
 
@@ -174,20 +174,8 @@ template<unsigned char Base> BigInteger<Base> BigInteger<Base>::operator/(const 
 template<unsigned char Base> BigInteger<Base> BigInteger<Base>::operator%(const BigInteger<Base>& divisor) const {
   BigUnsigned<Base> abs_numero = numero_;
   BigUnsigned<Base> abs_divisor = divisor.GetNumero();
-
   BigUnsigned<Base> result = abs_numero % abs_divisor;
-
-  bool result_sign = !(signo_ == divisor.GetSigno());
-
-  if (!result_sign) {
-    if (!(result == BigUnsigned<Base>())) {
-      result = abs_divisor - result;  
-    }
-  }
-
-  BigInteger<Base> result_bigint(result);
-  result_bigint.SetSigno(result_sign); 
-  return result_bigint;
+  return result;
 }
 
 /**
@@ -255,7 +243,8 @@ template<unsigned char Base> BigInteger<Base>& BigInteger<Base>::operator=(const
  */
 template<unsigned char Base> BigInteger<Base> mcd(const BigInteger<Base>& numero1, const BigInteger<Base>& numero2) {
   if (numero2.GetNumero() == BigUnsigned<Base>()) return numero1;
-  return mcd(numero2, numero1 % numero2);
+  return (mcd(numero2, numero1 % numero2));
 }
+
 
 #endif

@@ -13,34 +13,132 @@
 #include <iostream>
 #include <fstream>
 
-#include "BigInteger.h"
-#include "BigUnsigned.h"
+#include "BigRational.h"
 
-int main() {
+int main(int argc, char* argv[]) {
+  if (argc != 3) {
+    std::cerr << "No se ha aplicado correctamente el formato del ejecutable.\n./BigNumbers <fichero_entrada> <fichero_salida>\n";
+  }
 
-  BigInteger<2> Binario(-100);
-  BigInteger<2> Binario2(10);
-  BigInteger<8> Octal(-100);
-  BigInteger<10> Decimal(-100);
-  BigInteger<16> Hexadecimal(-100);
-  BigInteger<16> Hexadecimal2(88);
+  std::ifstream fichero_entrada(argv[1]);
+  std::ofstream fichero_salida(argv[2]);
 
-  Binario = Binario + Binario2;
-  Octal++;
-  Decimal--;
-  Hexadecimal = Hexadecimal - Hexadecimal2;
+  if (!fichero_entrada.is_open()) {
+    std::cerr << "No se ha podido abrir el fichero de entrada.\n";
+  } else if (!fichero_salida.is_open()) {
+    std::cerr << "No se ha podido abrir el fichero de salida.\n";
+  }
 
-  std::cout << Binario << "\n" << Octal << "\n" << Decimal << "\n" << Hexadecimal << "\n";
+  std::string entrada, base;
+  std::getline(fichero_entrada, base);
+  if (base.ends_with("16")) {
+    BigInteger<16> Num1, Num2;
+    BigUnsigned<16> Den1, Den2;
+    while (fichero_entrada >> entrada) {
+      if (entrada == "=") break;
+    }
+    fichero_entrada >> Num1;
+    fichero_entrada >> entrada;
+    fichero_entrada >> Den1;
+    BigRational<16> rational1(Num1, Den1);
+    while (fichero_entrada >> entrada) {
+      if (entrada == "=") break;
+    }
+    fichero_entrada >> Num2;
+    fichero_entrada >> entrada;
+    fichero_entrada >> Den2;
+    BigRational<16> rational2(Num2, Den2);
+    fichero_salida << base << "\n";
+    fichero_salida << "N1= " << rational1 << "\n";
+    fichero_salida << "N2= " << rational2 << "\n";
+    fichero_salida << "N1==N2: " << ((rational1 == rational2) ? "true" : "false") << "\n";
+    fichero_salida << "N1<N2:  " << ((rational1 < rational2) ? "true" : "false") << "\n";
+    fichero_salida << "N1+N2:  " << rational1 + rational2 << "\n";
+    fichero_salida << "N1-N2:  " << rational1 - rational2 << "\n";
+    fichero_salida << "N1*N2:  " << rational1 * rational2 << "\n";
+    fichero_salida << "N1/N2:  " << rational1 / rational2 << "\n";
+  } else if (base.ends_with("10")) {
+    BigInteger<10> Num1, Num2;
+    BigUnsigned<10> Den1, Den2;
+    while (fichero_entrada >> entrada) {
+      if (entrada == "=") break;
+    }
+    fichero_entrada >> Num1;
+    fichero_entrada >> entrada;
+    fichero_entrada >> Den1;
+    BigRational<10> rational1(Num1, Den1);
+    while (fichero_entrada >> entrada) {
+      if (entrada == "=") break;
+    }
+    fichero_entrada >> Num2;
+    fichero_entrada >> entrada;
+    fichero_entrada >> Den2;
+    BigRational<10> rational2(Num2, Den2);
+    fichero_salida << base << "\n";
+    fichero_salida << "N1= " << rational1 << "\n";
+    fichero_salida << "N2= " << rational2 << "\n";
+    fichero_salida << "N1==N2: " << ((rational1 == rational2) ? "true" : "false") << "\n";
+    fichero_salida << "N1<N2:  " << ((rational1 < rational2) ? "true" : "false") << "\n";
+    fichero_salida << "N1+N2:  " << rational1 + rational2 << "\n";
+    fichero_salida << "N1-N2:  " << rational1 - rational2 << "\n";
+    fichero_salida << "N1*N2:  " << rational1 * rational2 << "\n";
+    fichero_salida << "N1/N2:  " << rational1 / rational2 << "\n";
+  } else if (base.ends_with("8")) {
+    BigInteger<8> Num1, Num2;
+    BigUnsigned<8> Den1, Den2;
+    while (fichero_entrada >> entrada) {
+      if (entrada == "=") break;
+    }
+    fichero_entrada >> Num1;
+    fichero_entrada >> entrada;
+    fichero_entrada >> Den1;
+    BigRational<8> rational1(Num1, Den1);
+    while (fichero_entrada >> entrada) {
+      if (entrada == "=") break;
+    }
+    fichero_entrada >> Num2;
+    fichero_entrada >> entrada;
+    fichero_entrada >> Den2;
+    BigRational<8> rational2(Num2, Den2);
+    fichero_salida << base << "\n";
+    fichero_salida << "N1= " << rational1 << "\n";
+    fichero_salida << "N2= " << rational2 << "\n";
+    fichero_salida << "N1==N2: " << ((rational1 == rational2) ? "true" : "false") << "\n";
+    fichero_salida << "N1<N2:  " << ((rational1 < rational2) ? "true" : "false") << "\n";
+    fichero_salida << "N1+N2:  " << rational1 + rational2 << "\n";
+    fichero_salida << "N1-N2:  " << rational1 - rational2 << "\n";
+    fichero_salida << "N1*N2:  " << rational1 * rational2 << "\n";
+    fichero_salida << "N1/N2:  " << rational1 / rational2 << "\n";
+  } else if (base.ends_with("2")) {
+    BigInteger<2> Num1, Num2;
+    BigUnsigned<2> Den1, Den2;
+    while (fichero_entrada >> entrada) {
+      if (entrada == "=") break;
+    }
+    fichero_entrada >> Num1;
+    fichero_entrada >> entrada;
+    fichero_entrada >> Den1;
+    BigRational<2> rational1(Num1, Den1);
+    while (fichero_entrada >> entrada) {
+      if (entrada == "=") break;
+    }
+    fichero_entrada >> Num2;
+    fichero_entrada >> entrada;
+    fichero_entrada >> Den2;
+    BigRational<2> rational2(Num2, Den2);
+    fichero_salida << base << "\n";
+    fichero_salida << "N1= " << rational1 << "\n";
+    fichero_salida << "N2= " << rational2 << "\n";
+    fichero_salida << "N1==N2: " << ((rational1 == rational2) ? "true" : "false") << "\n";
+    fichero_salida << "N1<N2:  " << ((rational1 < rational2) ? "true" : "false") << "\n";
+    fichero_salida << "N1+N2:  " << rational1 + rational2 << "\n";
+    fichero_salida << "N1-N2:  " << rational1 - rational2 << "\n";
+    fichero_salida << "N1*N2:  " << rational1 * rational2 << "\n";
+    fichero_salida << "N1/N2:  " << rational1 / rational2 << "\n";
+  }
 
-  if (Binario == Binario2) std::cout << "Los numeros binarios son iguales\n";
-  else std::cout << "No son iguales los números en binario\n";
-
-  if (Hexadecimal < Hexadecimal2) std::cout << "El primer Hexadecimal es menor que el segundo\n";
-  else std::cout<< "El segundo Hexadecimal es menor que el primero\n";
-
-  BigInteger<2> Binario3(64);
-  BigInteger<2> Binario4(32);
-  std::cout << Binario3 / Binario4 << "\n" << Binario3 % Binario4 << "\n";
-
+  fichero_entrada.close();
+  fichero_salida.close();
+  std::cout << "Programa terminado.\n";
   return 0;
 }
