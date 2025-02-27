@@ -1,3 +1,0 @@
-/home/usuario/AYEDA/P1/build/CMakeFiles/BigNumbers.dir
-/home/usuario/AYEDA/P1/build/CMakeFiles/edit_cache.dir
-/home/usuario/AYEDA/P1/build/CMakeFiles/rebuild_cache.dir
