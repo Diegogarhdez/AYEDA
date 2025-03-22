@@ -1,0 +1,4 @@
+Base = 16
+E1 = AD9Ai
+N1 = 236i
+N2 = AB64i
