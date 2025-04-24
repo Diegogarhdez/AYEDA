@@ -1,0 +1,3 @@
+/home/usuario/AYEDA/P4/P4_casa/build/CMakeFiles/Hash.dir
+/home/usuario/AYEDA/P4/P4_casa/build/CMakeFiles/edit_cache.dir
+/home/usuario/AYEDA/P4/P4_casa/build/CMakeFiles/rebuild_cache.dir
