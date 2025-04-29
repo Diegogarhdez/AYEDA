@@ -1,0 +1,1 @@
+/usr/bin/c++ -rdynamic CMakeFiles/Arbol.dir/main.cc.o -o Arbol 

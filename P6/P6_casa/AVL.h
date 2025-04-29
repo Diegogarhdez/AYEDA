@@ -14,177 +14,234 @@
 #include <iostream>
 #include <queue>
 
-#include "nodoB.h"
 #include "ABB.h"
+#include "nif.h"
+#include "nodo.h"
 
 #ifndef AVL_H_
 #define AVL_H_
 
-template <typename Key>
-class AVL : public ABB<Key> {
+template <class Key>
+class AVL : public ABB<Key> {  // Deriva de ABB
  public:
-  AVL(bool traza_activada = false) : traza(traza_activada) {}
+  // Constructor y destructor heredados
+  AVL(bool modo_traza = false) : ABB<Key>(), traza(modo_traza) {}
 
+  // Redefinición de insertar para incluir balanceo
   bool insertar(const Key& k) override {
+    if (this->buscar(k)) {
+      return false;  // No se permiten duplicados
+    }
+    NodoAVL<Key>* nuevo_nodo = new NodoAVL<Key>(k);  // Crea un NodoAVL
     bool crece = false;
-    this->raiz = insertarAVL((NodoAVL<Key>*&)this->raiz, k, crece);
-    return crece;
+    return inserta_bal(reinterpret_cast<NodoAVL<Key>*&>(this->raiz), nuevo_nodo,
+                       crece);
+  }
+
+  bool buscar(const Key& k) const override {
+    return buscarAVL(reinterpret_cast<NodoAVL<Key>*>(this->raiz), k) != nullptr;
   }
 
  private:
   bool traza;
 
-  NodoAVL<Key>* insertarAVL(NodoAVL<Key>*& nodo, const Key& k, bool& crece) {
-    if (!nodo) {
-      nodo = new NodoAVL<Key>(k);
+  // Métodos de Rotación
+  void rotacion_II(NodoAVL<Key>*& nodo) {
+    NodoAVL<Key>* nodo1 = static_cast<NodoAVL<Key>*>(nodo->getIzdo());
+    nodo->setIzdo(nodo1->getDcho());
+    nodo1->setDcho(nodo);
+    if (nodo1->bal == 1) {
+      nodo->bal = 0;
+      nodo1->bal = 0;
+    } else {  // nodo1->bal == 0
+      nodo->bal = 1;
+      nodo1->bal = -1;
+    }
+    nodo = nodo1;
+  }
+
+  void rotacion_DD(NodoAVL<Key>*& nodo) {
+    NodoAVL<Key>* nodo1 = static_cast<NodoAVL<Key>*>(nodo->getDcho());
+    nodo->setDcho(nodo1->getIzdo());
+    nodo1->setIzdo(nodo);
+    if (nodo1->bal == -1) {
+      nodo->bal = 0;
+      nodo1->bal = 0;
+    } else {  // nodo1->bal == 0
+      nodo->bal = -1;
+      nodo1->bal = 1;
+    }
+    nodo = nodo1;
+  }
+
+  void rotacion_ID(NodoAVL<Key>*& nodo) {
+    NodoAVL<Key>* nodo1 = static_cast<NodoAVL<Key>*>(nodo->getIzdo());
+    NodoAVL<Key>* nodo2 = static_cast<NodoAVL<Key>*>(nodo1->getDcho());
+    nodo->setIzdo(nodo2->getDcho());
+    nodo2->setDcho(nodo);
+    nodo1->setDcho(nodo2->getIzdo());
+    nodo2->setIzdo(nodo1);
+    if (nodo2->bal == -1)
+      nodo1->bal = 1;
+    else
+      nodo1->bal = 0;
+    if (nodo2->bal == 1)
+      nodo->bal = -1;
+    else
+      nodo->bal = 0;
+    nodo2->bal = 0;
+    nodo = nodo2;
+  }
+
+  void rotacion_DI(NodoAVL<Key>*& nodo) {
+    NodoAVL<Key>* nodo1 = static_cast<NodoAVL<Key>*>(nodo->getDcho());
+    NodoAVL<Key>* nodo2 = static_cast<NodoAVL<Key>*>(nodo1->getIzdo());
+    nodo->setDcho(nodo2->getIzdo());
+    nodo2->setIzdo(nodo);
+    nodo1->setIzdo(nodo2->getDcho());
+    nodo2->setDcho(nodo1);
+    if (nodo2->bal == 1)
+      nodo1->bal = -1;
+    else
+      nodo1->bal = 0;
+    if (nodo2->bal == -1)
+      nodo->bal = 1;
+    else
+      nodo->bal = 0;
+    nodo2->bal = 0;
+    nodo = nodo2;
+  }
+
+  // Métodos de Inserción y Rebalanceo
+  bool inserta_bal(NodoAVL<Key>*& nodo, NodoAVL<Key>* nuevo, bool& crece) {
+    if (nodo == nullptr) {
+      nodo = nuevo;
       crece = true;
-      return nodo;
+      return true;
     }
 
-    if (k == nodo->getDato()) {
-      crece = false;
-      return nodo;
+    bool insertado = false;
+
+    if (nuevo->getDato() < nodo->getDato()) {
+      NodoAVL<Key>*& izdo = reinterpret_cast<NodoAVL<Key>*&>(nodo->getIzdoRef());
+      insertado = inserta_bal(izdo, nuevo, crece);
+      if (crece) insert_re_balancea_izda(nodo, crece);
+    } else if (nuevo->getDato() > nodo->getDato()) {
+      NodoAVL<Key>*& dcho = reinterpret_cast<NodoAVL<Key>*&>(nodo->getDchoRef());
+      insertado = inserta_bal(dcho, nuevo, crece);
+      if (crece) insert_re_balancea_dcha(nodo, crece);
     }
 
-    if (k < nodo->getDato()) {
-      nodo->setIzdo(insertarAVL((NodoAVL<Key>*&)nodo->getIzdo(), k, crece));
-      if (crece) nodo = balanceaIzquierda(nodo, crece);
-    } else {
-      nodo->setDcho(insertarAVL((NodoAVL<Key>*&)nodo->getDcho(), k, crece));
-      if (crece) nodo = balanceaDerecha(nodo, crece);
-    }
-
-    return nodo;
+    return insertado;
   }
 
-  NodoAVL<Key>* balanceaIzquierda(NodoAVL<Key>* nodo, bool& crece) {
-    NodoAVL<Key>* izdo = (NodoAVL<Key>*)nodo->getIzdo();
-
-    switch (nodo->getBal()) {
+  void insert_re_balancea_izda(NodoAVL<Key>*& nodo, bool& crece) {
+    switch (nodo->bal) {
       case -1:
-        nodo->setBal(0);
+        nodo->bal = 0;
         crece = false;
         break;
       case 0:
-        nodo->setBal(1);
+        nodo->bal = 1;
         break;
-      case 1:
-        if (traza) mostrarTraza("II", nodo);
-        if (izdo->getBal() == 1) {
-          nodo = rotacionII(nodo);
-        } else {
-          nodo = rotacionID(nodo);
+      case 1:  // Se desbalancea hacia la izquierda
+        if (traza) mostrar_desbalanceo("II o ID", nodo);
+        NodoAVL<Key>* nodo1 = static_cast<NodoAVL<Key>*>(nodo->getIzdo());
+        if (nodo1->bal == 1) {  // Rotación II
+          rotacion_II(nodo);
+        } else {  // Rotación ID (nodo1->bal == -1)
+          rotacion_ID(nodo);
         }
-        crece = false;
+        crece = false;  // La altura no cambia después de rotar
         break;
     }
-
-    return nodo;
   }
 
-  NodoAVL<Key>* balanceaDerecha(NodoAVL<Key>* nodo, bool& crece) {
-    NodoAVL<Key>* dcho = (NodoAVL<Key>*)nodo->getDcho();
-
-    switch (nodo->getBal()) {
+  void insert_re_balancea_dcha(NodoAVL<Key>*& nodo, bool& crece) {
+    switch (nodo->bal) {
       case 1:
-        nodo->setBal(0);
+        nodo->bal = 0;
         crece = false;
         break;
       case 0:
-        nodo->setBal(-1);
+        nodo->bal = -1;
         break;
-      case -1:
-        if (traza) mostrarTraza("DD", nodo);
-        if (dcho->getBal() == -1) {
-          nodo = rotacionDD(nodo);
-        } else {
-          nodo = rotacionDI(nodo);
+      case -1:  // Se desbalancea hacia la derecha
+        if (traza) mostrar_desbalanceo("DD o DI", nodo);
+        NodoAVL<Key>* nodo1 = static_cast<NodoAVL<Key>*>(nodo->getDcho());
+        if (nodo1->bal == -1) {  // Rotación DD
+          rotacion_DD(nodo);
+        } else {  // Rotación DI (nodo1->bal == 1)
+          rotacion_DI(nodo);
         }
-        crece = false;
+        crece = false;  // La altura no cambia después de rotar
+        if (traza) imprimir_con_balanceo();
         break;
     }
-
-    return nodo;
   }
 
-  NodoAVL<Key>* rotacionII(NodoAVL<Key>* nodo) {
-    NodoAVL<Key>* izdo = (NodoAVL<Key>*)nodo->getIzdo();
-    nodo->setIzdo(izdo->getDcho());
-    izdo->setDcho(nodo);
-    nodo->setBal(0);
-    izdo->setBal(0);
-    return izdo;
+  // Método Auxiliar para Traza
+  void mostrar_desbalanceo(const std::string& tipo_rotacion,
+                           NodoAVL<Key>* nodo_desbalanceado) {
+    std::cout << "\n------------------------------------\n";
+    std::cout << "Desbalanceo detectado en nodo [" << nodo_desbalanceado->dato
+              << "]\n";
+    std::cout << "Árbol ANTES de la rotación (" << tipo_rotacion
+              << " necesaria):\n";
+    imprimir_con_balanceo();
+    std::cout << "Aplicando rotación " << tipo_rotacion << " en nodo ["
+              << nodo_desbalanceado->dato << "]...\n";
+    std::cout << "------------------------------------\n";
   }
 
-  NodoAVL<Key>* rotacionDD(NodoAVL<Key>* nodo) {
-    NodoAVL<Key>* dcho = (NodoAVL<Key>*)nodo->getDcho();
-    nodo->setDcho(dcho->getIzdo());
-    dcho->setIzdo(nodo);
-    nodo->setBal(0);
-    dcho->setBal(0);
-    return dcho;
-  }
+  // Función auxiliar hipotética para imprimir con balance
+  void imprimir_con_balanceo() const {
+    std::cout
+        << "(Visualización con balanceo no implementada en este ejemplo)\n";
+    std::queue<std::pair<NodoAVL<Key>*, int>> Q;
+    NodoAVL<Key>* nodo_actual;
+    int nivel, nivel_actual = 0;
 
-  NodoAVL<Key>* rotacionID(NodoAVL<Key>* nodo) {
-    NodoAVL<Key>* izdo = (NodoAVL<Key>*)nodo->getIzdo();
-    NodoAVL<Key>* nuevo = (NodoAVL<Key>*)izdo->getDcho();
-
-    izdo->setDcho(nuevo->getIzdo());
-    nuevo->setIzdo(izdo);
-    nodo->setIzdo(nuevo->getDcho());
-    nuevo->setDcho(nodo);
-
-    switch (nuevo->getBal()) {
-      case 1:
-        nodo->setBal(-1);
-        izdo->setBal(0);
-        break;
-      case -1:
-        nodo->setBal(0);
-        izdo->setBal(1);
-        break;
-      case 0:
-        nodo->setBal(0);
-        izdo->setBal(0);
-        break;
+    std::cout << "Recorrido por Niveles (con Balanceo):" << std::endl;
+    if (this->raiz == nullptr) {  // Acceder a raiz de la clase base
+      std::cout << "Nivel 0: [.]" << std::endl;
+      return;
     }
 
-    nuevo->setBal(0);
-    return nuevo;
-  }
+    // Empezar con la raíz casteada a NodoAVL*
+    Q.push({static_cast<NodoAVL<Key>*>(this->raiz), 0});
+    std::cout << "Nivel 0: ";
 
-  NodoAVL<Key>* rotacionDI(NodoAVL<Key>* nodo) {
-    NodoAVL<Key>* dcho = (NodoAVL<Key>*)nodo->getDcho();
-    NodoAVL<Key>* nuevo = (NodoAVL<Key>*)dcho->getIzdo();
+    while (!Q.empty()) {
+      std::pair<NodoAVL<Key>*, int> par = Q.front();
+      Q.pop();
+      nodo_actual = par.first;
+      nivel = par.second;
 
-    dcho->setIzdo(nuevo->getDcho());
-    nuevo->setDcho(dcho);
-    nodo->setDcho(nuevo->getIzdo());
-    nuevo->setIzdo(nodo);
+      if (nivel > nivel_actual) {
+        nivel_actual = nivel;
+        std::cout << std::endl << "Nivel " << nivel_actual << ": ";
+      }
 
-    switch (nuevo->getBal()) {
-      case 1:
-        nodo->setBal(0);
-        dcho->setBal(-1);
-        break;
-      case -1:
-        nodo->setBal(1);
-        dcho->setBal(0);
-        break;
-      case 0:
-        nodo->setBal(0);
-        dcho->setBal(0);
-        break;
+      if (nodo_actual != nullptr) {
+        std::cout << "[" << nodo_actual->dato << "(" << nodo_actual->bal
+                  << ")] ";
+        Q.push({static_cast<NodoAVL<Key>*>(nodo_actual->getIzdo()), nivel + 1});
+        Q.push({static_cast<NodoAVL<Key>*>(nodo_actual->getDcho()), nivel + 1});
+      } else {
+        std::cout << "[.] ";
+      }
     }
-
-    nuevo->setBal(0);
-    return nuevo;
+    std::cout << std::endl;
   }
 
-  void mostrarTraza(const std::string& tipo, NodoAVL<Key>* nodo) {
-    std::cout << "Desbalanceo:\n" << *this;
-    std::cout << "Rotación " << tipo << " en [" << nodo->getDato() << "("
-              << nodo->getBal() << ")]:\n";
+  NodoAVL<Key>* buscarAVL(NodoAVL<Key>* nodo, const Key& clave_dada) const {
+    if (!nodo) return nullptr;
+    if (clave_dada == nodo->getDato()) return nodo;
+    if (clave_dada < nodo->getDato())
+      return buscarAVL(static_cast<NodoAVL<Key>*>(nodo->getIzdo()), clave_dada);
+    else
+      return buscarAVL(static_cast<NodoAVL<Key>*>(nodo->getDcho()), clave_dada);
   }
 };
 

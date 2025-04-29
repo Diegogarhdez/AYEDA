@@ -38,6 +38,10 @@ include_directories(${PROJECT_SOURCE_DIR})
 
 # Adds an executable target called "Arbol" to be built from the source files listed in the command invocation.
 add_executable("Arbol"
+    AVL.h
+    ABB.h
+    nodo.h
+    nif.h
     main.cc
     )
 # Add expected compiler features to a target.

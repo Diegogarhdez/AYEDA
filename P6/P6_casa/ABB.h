@@ -13,114 +13,207 @@
 #ifndef ABB_H_
 #define ABB_H_
 
-template <typename Key>
+#include <queue>
+
+#include "nif.h"
+#include "nodo.h"
+
+template <class Key>
 class AB {
  public:
+  // Constructor
   AB() : raiz(nullptr) {}
-  virtual ~AB() {}
 
+  // Destructor
+  virtual ~AB() { Podar(raiz); }
+
+  // Métodos Virtuales
   virtual bool insertar(const Key& k) = 0;
   virtual bool buscar(const Key& k) const = 0;
+  virtual bool eliminar(const Key& k) = 0;  // Opcional
+
+  bool EsVacio() const { return raiz == nullptr; }
+
   void inorden() const {
-    inordenRec(raiz);
+    std::cout << "Recorrido Inorden: ";
+    inordenRama(raiz);
     std::cout << std::endl;
   }
 
+  // Sobrecarga del operador << para recorrido por niveles
   friend std::ostream& operator<<(std::ostream& os, const AB<Key>& arbol) {
-    arbol.imprimirNivel();
+    arbol.recorreN(os);
     return os;
   }
 
  protected:
+  // Atributo raíz
+  NodoB<Key>* raiz;
 
-  void inordenRec(NodoB<Key>* nodo) const {
-    if (nodo) {
-      inordenRec(nodo->getIzdo());
-      std::cout << nodo->getDato() << " ";
-      inordenRec(nodo->getDcho());
-    }
+  // Métodos Auxiliares Protegidos
+  void Podar(NodoB<Key>*& nodo) {
+    if (nodo == nullptr) return;
+    Podar(nodo->getIzdoRef());
+    Podar(nodo->getDchoRef());
+    delete nodo;
+    nodo = nullptr;
   }
 
-  void imprimirNivel() const {
-    if (!raiz) {
-      std::cout << "Nivel 0: [.] \n";
+  bool EsHoja(const NodoB<Key>* nodo) const {
+    return nodo != nullptr && nodo->getDcho() == nullptr &&
+           nodo->getIzdo() == nullptr;
+  }
+
+  int TamRama(const NodoB<Key>* nodo) const {
+    if (!nodo) return 0;
+    return 1 + TamRama(nodo->getIzdo()) + TamRama(nodo->getDcho());
+  }
+
+  int AltN(const NodoB<Key>* nodo) const {
+    if (nodo == nullptr) return 0;
+    int alt_i = AltN(nodo->getIzdo());
+    int alt_d = AltN(nodo->getDcho());
+    return 1 + std::max(alt_i, alt_d);
+  }
+
+  // Recorrido Inorden Recursivo
+  void inordenRama(NodoB<Key>* nodo) const {
+    if (nodo == nullptr) return;
+    inordenRama(nodo->getIzdo());
+    std::cout << "[" << nodo->dato
+              << "] ";  // Asumiendo que Key tiene sobrecargado <<
+    inordenRama(nodo->getDcho());
+  }
+
+  // Recorrido por Niveles
+  void recorreN(std::ostream& os) const {
+    std::queue<std::pair<NodoB<Key>*, int>> Q;
+    NodoB<Key>* nodo_actual;
+    int nivel, nivel_actual = 0;
+
+    os << "Recorrido por Niveles:" << std::endl;
+    if (raiz == nullptr) {
+      os << "Nivel 0: [.]" << std::endl;
       return;
     }
 
-    std::queue<NodoB<Key>*> q;
-    q.push(raiz);
-    int nivel = 0;
+    Q.push({raiz, 0});
+    os << "Nivel 0: ";
 
-    while (!q.empty()) {
-      int nivelSize = q.size();
-      std::cout << "Nivel " << nivel++ << ": ";
-      for (int i = 0; i < nivelSize; ++i) {
-        NodoB<Key>* nodo = q.front();
-        q.pop();
-        if (nodo) {
-          std::cout << "[" << nodo->getDato() << "] ";
-          q.push(nodo->getIzdo());
-          q.push(nodo->getDcho());
-        } else {
-          std::cout << "[.] ";
-          q.push(nullptr);
-          q.push(nullptr);
-        }
+    while (!Q.empty()) {
+      std::pair<NodoB<Key>*, int> par = Q.front();
+      Q.pop();
+      nodo_actual = par.first;
+      nivel = par.second;
+
+      if (nivel > nivel_actual) {
+        nivel_actual = nivel;
+        os << std::endl << "Nivel " << nivel_actual << ": ";
       }
-      std::cout << "\n";
-      // Salimos si todos son nullptr
-      if (std::all_of(q.front(), q.back(),
-                      [](NodoB<Key>* n) { return n == nullptr; }))
-        break;
+
+      if (nodo_actual != nullptr) {
+        os << "[" << nodo_actual->dato;  // Imprimir dato
+        if (const NodoAVL<Key>* nodoAVL =
+                dynamic_cast<const NodoAVL<Key>*>(nodo_actual)) {
+          os << "(" << nodoAVL->GetBal() << ")";
+        }
+        os << "] ";
+        Q.push({nodo_actual->getIzdo(), nivel + 1});
+        Q.push({nodo_actual->getDcho(), nivel + 1});
+      } else {
+        os << "[.] ";
+      }
     }
+    os << std::endl;
   }
 
- private:
-  NodoB<Key>* raiz;
+  virtual void Procesar(NodoB<Key>* nodo) const {
+    std::cout << nodo->dato << " ";
+  }
 };
 
-template <typename Key>
+template <class Key>
 class ABB : public AB<Key> {
  public:
-  bool insertar(const Key& k) override { return insertarRec(this->raiz, k); }
-  bool buscar(const Key& k) const override { return buscarRec(this->raiz, k); }
+  // Hereda constructor y destructor de AB
 
- private:
-  bool insertarRec(NodoB<Key>*& nodo, const Key& k) {
-    if (!nodo) {
-      nodo = new NodoB<Key>(k);
+  // Implementación de métodos virtuales
+  bool insertar(const Key& k) override {
+    // Si ya existe, no inserta y devuelve false
+    if (buscar(k)) {
+      return false;
+    }
+    return insertarRama(this->raiz, k); 
+  }
+
+  bool buscar(const Key& k) const override {
+    return buscarRama(this->raiz, k) != nullptr;
+  }
+
+  // Implementación de eliminar (opcional)
+  bool eliminar(const Key& k) override { return eliminarRec(this->raiz, k); }
+
+  bool eliminarRec(NodoB<Key>*& nodo, const Key& k) {
+    if (!nodo) return false;
+
+    if (k < nodo->getDato()) {
+      return eliminarRec(nodo->getIzdoRef(), k);
+    } else if (k > nodo->getDato()) {
+      return eliminarRec(nodo->getDchoRef(), k);
+    } else {  // Nodo encontrado
+      if (!nodo->getIzdo() && !nodo->getDcho()) {
+        delete nodo;
+        nodo = nullptr;
+      } else if (!nodo->getIzdo()) {
+        NodoB<Key>* temp = nodo;
+        nodo = nodo->getDcho();
+        delete temp;
+      } else if (!nodo->getDcho()) {
+        NodoB<Key>* temp = nodo;
+        nodo = nodo->getIzdo();
+        delete temp;
+      } else {
+        NodoB<Key>* sucesor = minimo(nodo->getDcho());
+        nodo->dato = sucesor->getDato();
+        eliminarRec(nodo->getDchoRef(), sucesor->getDato());
+      }
       return true;
     }
-    if (k < nodo->getDato())
-      return insertarRec(nodo->getIzdo(), k);
-    else if (k > nodo->getDato())
-      return insertarRec(nodo->getDcho(), k);
-    else
-      return false;
   }
 
-  bool buscarRec(NodoB<Key>* nodo, const Key& k) const {
-    if (!nodo) return false;
-    if (k == nodo->getDato()) return true;
-    if (k < nodo->getDato())
-      return buscarRec(nodo->getIzdo(), k);
-    else
-      return buscarRec(nodo->getDcho(), k);
+  NodoB<Key>* minimo(NodoB<Key>* nodo) const {
+    while (nodo->getIzdo()) nodo = nodo->getIzdo();
+    return nodo;
   }
-};
 
-template <typename Key>
-class NodoAVL : public NodoB<Key> {
- public:
-  NodoAVL(const Key& d, NodoAVL<Key>* i = nullptr, NodoAVL<Key>* dch = nullptr,
-          int b = 0)
-      : NodoB<Key>(d, i, dch), bal(b) {}
+ protected:
+  NodoB<Key>* buscarRama(NodoB<Key>* nodo, const Key& clave_dada) const {
+    if (!nodo) return nullptr;
 
-  int getBal() const { return bal; }
-  void setBal(int b) { bal = b; }
+    if (clave_dada == nodo->getDato()) return nodo;
 
- private:
-  int bal;  // Factor de balanceo
+    if (clave_dada < nodo->getDato())
+      return buscarRama(nodo->getIzdo(), clave_dada);
+
+    return buscarRama(nodo->getDcho(), clave_dada);
+  }
+
+  bool insertarRama(NodoB<Key>*& nodo, const Key& clave_dada) {
+    if (!nodo) {
+      nodo = new NodoB<Key>(clave_dada);
+      return true;
+    }
+
+    if (clave_dada < nodo->getDato()) {
+      return insertarRama(nodo->getIzdoRef(), clave_dada);
+    }
+
+    if (clave_dada > nodo->getDato()) {
+      return insertarRama(nodo->getDchoRef(), clave_dada);
+    }
+
+    return false;  // clave ya existe
+  }
 };
 
 #endif
