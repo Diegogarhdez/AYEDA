@@ -10,24 +10,26 @@
 // Archivo main.cc
 // Descripción: contiene la función principal
 
-#include <iostream>
-#include <fstream>
-#include <string>
 #include <cstdlib>
+#include <fstream>
+#include <iostream>
+#include <string>
 
-#include "AVL.h"
 #include "ABB.h"
+#include "AVL.h"
 #include "nif.h"
 
 void Help() {
   std::cout << "\n\n      Uso del programa:\n\n"
             << "-ab [abb|avl] para definir el tipo de árbol.\n"
-            << "-init <i> [s] [f] la i es el tipo de inicialización, la s el tamaño y la f el nombre del fichero.\n"
+            << "-init <i> [s] [f] la i es el tipo de inicialización, la s el "
+               "tamaño y la f el nombre del fichero.\n"
             << "  i=manual [s]\n"
             << "  i=random [s]\n"
             << "  i=file [s] [t]\n"
             << "-trace [y|n] para mostrar la traza o no.\n\n"
-            << "Por defecto se pondrá un árbol abb, inicialización random con size 10 y no se mostrará la traza.\n";
+            << "Por defecto se pondrá un árbol abb, inicialización random con "
+               "size 10 y no se mostrará la traza.\n";
 }
 
 void Menu() {
@@ -39,7 +41,6 @@ void Menu() {
 }
 
 int main(int argc, char* argv[]) {
-
   bool trace = false;
   std::string arbol = "abb";
   std::string inicializacion = "random";
@@ -47,13 +48,14 @@ int main(int argc, char* argv[]) {
   size_t size = 10;
 
   for (int i = 1; i < argc; ++i) {
-    if (std::string(argv[i]) == "-ab" && i + 1 < argc) arbol = argv[++i];
+    if (std::string(argv[i]) == "-ab" && i + 1 < argc)
+      arbol = argv[++i];
     else if (std::string(argv[i]) == "-init") {
       inicializacion = argv[++i];
       if (i + 1 < argc) size = std::stoi(argv[++i]);
       if (inicializacion == "file" && i + 1 < argc) nombre_fichero = argv[++i];
-    }
-    else if (std::string(argv[i]) == "-trace" && i + 1 < argc) trace = (argv[++i]) ? true : false;
+    } else if (std::string(argv[i]) == "-trace" && i + 1 < argc)
+      trace = (argv[++i]) ? true : false;
     else {
       Help();
       return 1;
@@ -61,9 +63,11 @@ int main(int argc, char* argv[]) {
   }
 
   AB<nif>* tree = nullptr;
-  if (arbol == "avl") tree = new AVL<nif>(trace); 
-  else tree = new ABB<nif>();
-  
+  if (arbol == "avl")
+    tree = new AVL<nif>(trace);
+  else
+    tree = new ABB<nif>();
+
   if (inicializacion == "random") {
     srand(time(nullptr));
     for (size_t i = 0; i < size; ++i) {
@@ -97,8 +101,8 @@ int main(int argc, char* argv[]) {
 
   while (true) {
     char c;
-    std::cout<< "\nIngrese cualquier caracter para continuar: ";
-    std::cin>> c;
+    std::cout << "\nIngrese cualquier caracter para continuar: ";
+    std::cin >> c;
 
     system("clear");
 
@@ -111,39 +115,41 @@ int main(int argc, char* argv[]) {
     std::cout << "\n\n";
 
     switch (opcion) {
-    case 0:
-      delete tree;
-      std::cout << "Programa terminado con exito.\n";
-      return 0;
-    case 1: {
-      long clave;
-      std::cout << "Introduzca la clave a insertar: ";
-      std::cin >> clave;
-      if (tree->insertar(nif(clave))) {
-        std::cout << "Clave insertada correctamente.\n";
-      } else {
-        std::cout << "La clave ya existe en el árbol.\n";
+      case 0: {
+        delete tree;
+        std::cout << "Programa terminado con exito.\n";
+        return 0;
       }
-      std::cout << *tree;
-      break;
-    }
-    case 2: {
-      long clave;
-      std::cout << "Introduzca la clave a buscar: ";
-      std::cin >> clave;
-      if (tree->buscar(nif(clave))) {
-        std::cout << "Clave encontrada en el árbol.\n";
-      } else {
-        std::cout << "Clave no encontrada.\n";
+      case 1: {
+        long clave;
+        std::cout << "Introduzca la clave a insertar: ";
+        std::cin >> clave;
+        if (tree->insertar(nif(clave))) {
+          std::cout << "Clave insertada correctamente.\n";
+        } else {
+          std::cout << "La clave ya existe en el árbol.\n";
+        }
+        std::cout << *tree;
+        break;
       }
-      break;
-    }
-    case 3:
-      tree->inorden();
-      break;
-    default:
-      std::cerr << "Opción no contemplada.\n";
-      break;
+      case 2: {
+        long clave;
+        std::cout << "Introduzca la clave a buscar: ";
+        std::cin >> clave;
+        if (tree->buscar(nif(clave))) {
+          std::cout << "Clave encontrada en el árbol.\n";
+        } else {
+          std::cout << "Clave no encontrada.\n";
+        }
+        break;
+      }
+      case 3:
+        tree->inorden();
+        break;
+      default: {
+        std::cerr << "Opción no contemplada.\n";
+        break;
+      }
     }
   }
 
